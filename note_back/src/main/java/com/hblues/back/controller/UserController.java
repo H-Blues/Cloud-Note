@@ -1,9 +1,14 @@
 package com.hblues.back.controller;
 
 import com.hblues.back.pojo.User;
+import com.hblues.back.response.Response;
 import com.hblues.back.service.UserService;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.SimpleHash;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -40,5 +45,21 @@ public class UserController {
         userService.addUser(user);
 
         return "创建成功";
+    }
+
+    @CrossOrigin
+    @PostMapping("api/login")
+    @ResponseBody
+    public Response login(@RequestBody User user) {
+        String username = user.getUsername();
+        Subject subject = SecurityUtils.getSubject();
+        UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, user.getPassword());
+
+        try {
+            subject.login(usernamePasswordToken);
+            return new Response(200, "success", usernamePasswordToken);
+        } catch (AuthenticationException e) {
+            return new Response(500, "failure", null);
+        }
     }
 }
