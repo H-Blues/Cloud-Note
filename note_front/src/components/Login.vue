@@ -1,7 +1,7 @@
 <template>
     <div class="container">
       <div class="form-body">
-        <h2>注册账户</h2>
+        <h2>登录账户</h2>
         <el-form ref="form" :model="LoginForm" label-width="0px">
           <el-form-item  class="form-item">
             <el-input placeholder="请输入用户名" v-model="LoginForm.username"></el-input>
@@ -31,6 +31,23 @@
       },
       methods: {
         onSubmit(){
+          var _this = this
+          this.axios.post('/login', {
+            username: this.LoginForm.username,
+            password: this.LoginForm.password,
+          })
+          .then(function (response) {
+            if (response.data.status == 200) {
+              _this.$store.commit('login',response.data.object)
+              _this.$router.push({path: '/'})
+            }
+            else {
+              alert("账号或密码错误")
+            }
+          })
+          .catch(function (error) {
+            console.log(error)
+          })
         }
       }
     }
